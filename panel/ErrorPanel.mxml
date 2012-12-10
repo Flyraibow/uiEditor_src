@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="600" height="480" creationComplete="group1_creationCompleteHandler(event)">
+	<fx:Script>
+		<![CDATA[
+			
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			
+			public var errorList : Vector.<String>;
+			
+			protected function group1_creationCompleteHandler(event:FlexEvent):void
+			{
+				// TODO Auto-generated method stub
+				var errorString : String = "";
+				var count : int = errorList.length;
+				for(var i : int = 0; i < count; ++i)
+				{
+					errorString += errorList[i] + "\n";
+				}
+				txtArea.text = errorString;
+				Manager.textInPutEnable = false;
+			}
+			
+			protected function button1_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				PopUpManager.removePopUp(this);
+				Manager.textInPutEnable = true;
+				Mouse.cursor = MouseCursor.AUTO;
+			}
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<s:Panel left="0" right="0" top="0" bottom="0" title="错误提示">
+		<s:Button y="416" label="关闭" click="button1_clickHandler(event)" horizontalCenter="0"/>
+		<mx:TextArea id="txtArea" x="10" y="10" width="578" height="398" mouseEnabled="false" editable="false"/>
+	</s:Panel>
+</s:Group>

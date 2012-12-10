@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="210" height="138" creationComplete="group1_creationCompleteHandler(event)">
+	<fx:Script>
+		<![CDATA[
+			
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			
+			public var callbackFunction : Function;
+			public var editorable : Boolean;
+			public var num : Number;
+			
+			protected function group1_creationCompleteHandler(event:FlexEvent):void
+			{
+				// TODO Auto-generated method stub
+				txtInput.text = num.toString();
+				Manager.textInPutEnable = false;
+				txtInput.enabled = editorable;
+			}
+			
+			protected function button1_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				PopUpManager.removePopUp(this);
+				Manager.textInPutEnable = true;
+			}
+			
+			protected function button2_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				PopUpManager.removePopUp(this);
+				Manager.textInPutEnable = true;
+				callbackFunction(Number(txtInput.text));
+			}
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<s:Panel left="0" right="0" top="0" bottom="0" title="输入数值">
+		<mx:TextInput id="txtInput" left="10" right="10" top="24" height="32" restrict="-.0-9"/>
+		<s:Button bottom="14" label="确定" click="button2_clickHandler(event)" horizontalCenter="-51"/>
+		<s:Button bottom="14" label="取消" click="button1_clickHandler(event)" horizontalCenter="51"/>
+	</s:Panel>
+</s:Group>

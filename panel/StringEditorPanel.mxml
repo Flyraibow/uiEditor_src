@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="314" height="158" creationComplete="group1_creationCompleteHandler(event)">
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			
+			import ui.comp.LabelEditor;
+			import ui.struct.LabelData;
+			
+			public var callbackFunction : Function;
+			public var type : int;						// 0修改文本，1添加文本
+			public var str : String;
+			
+			protected function button1_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				PopUpManager.removePopUp(this);
+				Manager.textInPutEnable = true;
+			}
+			
+			protected function group1_creationCompleteHandler(event:FlexEvent):void
+			{
+				// TODO Auto-generated method stub
+				if(str == null)
+				{
+					str = "Label";
+				}
+				txtArea.text = str;
+				Manager.textInPutEnable = false;
+			}
+			
+			protected function button2_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				PopUpManager.removePopUp(this);
+				Manager.textInPutEnable = true;
+				if(type == 0)
+				{
+					callbackFunction(txtArea.text);
+				}
+				else if(type == 1)
+				{
+					var label : LabelEditor = new LabelEditor();
+					label.text = txtArea.text;
+					var labelData : LabelData = new LabelData();
+					labelData.setLabel(label)
+					callbackFunction(labelData);
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<s:Panel left="0" right="0" top="0" bottom="0" title="输入字符">
+		<mx:TextArea id="txtArea" left="0" right="0" top="0" bottom="40"/>
+		<s:Button bottom="10" label="确定" click="button2_clickHandler(event)" horizontalCenter="-68"/>
+		<s:Button bottom="10" label="取消" click="button1_clickHandler(event)" horizontalCenter="51"/>
+		
+	</s:Panel>
+</s:Group>

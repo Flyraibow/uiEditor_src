@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="500" height="354" creationComplete="group1_creationCompleteHandler(event)">
+	<fx:Script>
+		<![CDATA[
+			import components.ButtonInfo;
+			
+			import fl.controls.Button;
+			
+			
+			import mx.collections.ArrayCollection;
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			
+			import spark.events.IndexChangeEvent;
+			
+			import ui.UISprite;
+			import ui.comp.ButtonEditor;
+			import ui.struct.ButtonData;
+			
+			public var optionManager : OptionManager;
+			
+			public var callbackFunction : Function;
+			
+			public var buttonData : ButtonData;
+			
+			private var _uiSprite : UISprite;
+			private var _buttonEditor : ButtonEditor;
+			
+			protected function group1_creationCompleteHandler(event:FlexEvent):void
+			{
+				// TODO Auto-generated method stub
+				
+				Manager.textInPutEnable = false;
+				listButton.dataProvider = optionManager.buttonList;
+				
+				_uiSprite = new UISprite();
+				image.source = _uiSprite;
+				_buttonEditor = new ButtonEditor();
+				_buttonEditor.buttonDic = optionManager.buttonSkinDic;
+				_uiSprite.addChild(_buttonEditor);
+				if(buttonData != null)
+				{
+					var skinName : String = buttonData.button.getSkinName();
+					_buttonEditor.changeSkin(skinName);
+					_buttonEditor.label = buttonData.button.label;
+					listButton.selectedItem = skinName;
+				}
+				
+				_buttonEditor.x = (image.width - _buttonEditor.width) / 2;
+				_buttonEditor.y = (image.height - _buttonEditor.height) / 2;
+			}
+			
+			protected function button1_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				PopUpManager.removePopUp(this);
+				Manager.textInPutEnable = true;
+			}
+			
+			protected function listButton_changeHandler(event:IndexChangeEvent):void
+			{
+				// TODO Auto-generated method stub
+				var selectItem : String = listButton.selectedItem as String;
+				if(selectItem != null)
+				{
+					_buttonEditor.changeSkin(selectItem);
+					
+					_buttonEditor.x = (image.width - _buttonEditor.width) / 2;
+					_buttonEditor.y = (image.height - _buttonEditor.height) / 2;
+				}
+			}
+			
+			
+			protected function button2_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				if(buttonData == null)
+				{
+					buttonData = new ButtonData();
+					buttonData.setButton(_buttonEditor);
+					callbackFunction(buttonData);
+				}
+				else
+				{
+					buttonData.button.changeSkin(_buttonEditor.getSkinName());
+					buttonData.updateSkin();
+				}
+				PopUpManager.removePopUp(this);
+				Manager.textInPutEnable = true;
+			}
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<s:Panel left="0" right="0" top="0" bottom="0" title="选择按钮">
+		<s:List id="listButton" x="10" y="10" height="275" change="listButton_changeHandler(event)"
+				labelField="name"></s:List>
+		<s:Button x="160" y="290" label="确定" click="button2_clickHandler(event)"/>
+		<s:Button x="278" y="290" label="取消" click="button1_clickHandler(event)"/>
+		<s:BorderContainer x="130" y="10" width="358" height="272">
+			<mx:SWFLoader id="image" left="0" right="0" top="0" bottom="0" scaleContent="false">
+			</mx:SWFLoader>
+		</s:BorderContainer>
+	</s:Panel>
+</s:Group>

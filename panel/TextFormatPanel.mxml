@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="528" height="364" creationComplete="group1_creationCompleteHandler(event)">
+	<fx:Script>
+		<![CDATA[
+			import components.TextFormatInfo;
+			
+			import flashx.textLayout.formats.TextAlign;
+			
+			
+			import mx.controls.Alert;
+			import mx.events.ColorPickerEvent;
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			
+			import spark.events.IndexChangeEvent;
+			import spark.events.TextOperationEvent;
+			
+			public var callbackFunction : Function;
+			public var optionManager : OptionManager;
+			public var textFormatLabel : String;
+			
+			private var _textField : TextField;
+			private var _textFormat : TextFormat;
+			
+			protected function group1_creationCompleteHandler(event:FlexEvent):void
+			{
+				// TODO Auto-generated method stub
+				Manager.textInPutEnable = false;
+				list.dataProvider = optionManager.textFormatCollection;
+				
+				var sprite : Sprite = new Sprite();
+				image.source = sprite;
+				_textFormat = new TextFormat();
+				_textField = new TextField();
+				sprite.addChild(_textField);
+				_textField.width = image.width;
+				_textField.height = image.height;
+				_textField.defaultTextFormat = _textFormat;
+				_textField.text = txtLabel.text;
+				txtFont.text = _textFormat.font;
+				
+				if(textFormatLabel != null && textFormatLabel.length > 0)
+				{
+					var selectFormatInfo : TextFormatInfo = optionManager.textFormatDic[textFormatLabel];
+					if(selectFormatInfo != null)
+					{
+						list.selectedItem = selectFormatInfo;
+						list_changeHandler(null);
+					}
+				}
+			}
+			
+			protected function txtLabel_changeHandler(event:Event):void
+			{
+				// TODO Auto-generated method stub
+				_textField.text = txtLabel.text;
+			}
+			
+			protected function numSize_changeHandler(event:Event):void
+			{
+				// TODO Auto-generated method stub
+				_textFormat.size = int(numSize.value);
+				_textField.defaultTextFormat = _textFormat;
+				_textField.text = txtLabel.text;
+			}
+			
+			protected function checkBold_changeHandler(event:Event):void
+			{
+				// TODO Auto-generated method stub
+				_textFormat.bold = checkBold.selected;
+				_textField.defaultTextFormat = _textFormat;
+				_textField.text = txtLabel.text;
+			}
+			
+			protected function checkItalic_changeHandler(event:Event):void
+			{
+				// TODO Auto-generated method stub
+				_textFormat.italic = checkItalic.selected;
+				_textField.defaultTextFormat = _textFormat;
+				_textField.text = txtLabel.text;
+			}
+			
+			protected function colorPicker_changeHandler(event:ColorPickerEvent):void
+			{
+				// TODO Auto-generated method stub
+				_textFormat.color = colorPicker.selectedColor;
+				_textField.defaultTextFormat = _textFormat;
+				_textField.text = txtLabel.text;
+			}
+			
+			protected function radiobutton1_changeHandler(event:Event):void
+			{
+				// TODO Auto-generated method stub
+				if(rLeft.selected)
+				{
+					_textFormat.align = TextAlign.LEFT;
+					_textField.defaultTextFormat = _textFormat;
+					_textField.text = txtLabel.text;
+				}
+				else if(rCenter.selected)
+				{
+					_textFormat.align = TextAlign.CENTER;
+					_textField.defaultTextFormat = _textFormat;
+					_textField.text = txtLabel.text;
+				}
+				else if(rRight.selected)
+				{
+					_textFormat.align = TextAlign.RIGHT;
+					_textField.defaultTextFormat = _textFormat;
+					_textField.text = txtLabel.text;
+				}
+			}
+			
+			protected function button1_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				var id : String = txtId.text;
+				if(id.length > 0)
+				{
+					var textFormatInfo : TextFormatInfo = optionManager.textFormatDic[id];
+					if(textFormatInfo == null)
+					{
+						textFormatInfo = new TextFormatInfo();
+						textFormatInfo.label = id;
+						var textFormat : TextFormat = new TextFormat();
+						textFormat.font = txtFont.text;
+						textFormat.size = numSize.value;;
+						textFormat.color = colorPicker.selectedColor;
+						textFormat.bold = checkBold.selected;
+						textFormat.italic = checkItalic.selected;
+						if(rLeft.selected)
+						{
+							textFormat.align = TextAlign.LEFT;
+						}
+						else if(rCenter.selected)
+						{
+							textFormat.align = TextAlign.CENTER;
+						}
+						else if(rRight.selected)
+						{
+							textFormat.align = TextAlign.RIGHT;
+						}
+						textFormatInfo.textFormat = textFormat;
+						optionManager.textFormatCollection.addItem(textFormatInfo);
+						optionManager.textFormatDic[id] = textFormatInfo;
+						optionManager.saveTextFormat();
+					}
+					else
+					{
+						Alert.show("命名重复");
+					}
+				}
+				else
+				{
+					Alert.show("填写有效Id");
+				}
+			}
+			
+			protected function list_changeHandler(event:IndexChangeEvent):void
+			{
+				// TODO Auto-generated method stub
+				var selectTextFormatInfo : TextFormatInfo = list.selectedItem;
+				if(selectTextFormatInfo != null)
+				{
+					txtId.text = selectTextFormatInfo.label;
+					
+					_textFormat.font = selectTextFormatInfo.textFormat.font;
+					_textFormat.size = selectTextFormatInfo.textFormat.size;
+					_textFormat.color = selectTextFormatInfo.textFormat.color;
+					_textFormat.bold = selectTextFormatInfo.textFormat.bold;
+					_textFormat.italic = selectTextFormatInfo.textFormat.italic;
+					_textFormat.align = selectTextFormatInfo.textFormat.align;
+					txtFont.text = _textFormat.font;
+					numSize.value = int(_textFormat.size);
+					colorPicker.selectedColor = uint(_textFormat.color);
+					checkBold.selected = _textFormat.bold; 
+					checkItalic.selected = _textFormat.italic;
+					switch(_textFormat.align)
+					{
+						case TextAlign.LEFT:
+							rLeft.selected = true;
+							break;
+						case TextAlign.CENTER:
+							rCenter.selected = true;
+							break;
+						case TextAlign.RIGHT:
+							rRight.selected = true;
+							break;
+					}
+					_textField.defaultTextFormat = _textFormat;
+					_textField.text = txtLabel.text;
+				}
+			}
+			
+			protected function button2_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				var selectTextFormatInfo : TextFormatInfo = list.selectedItem;
+				if(selectTextFormatInfo != null)
+				{
+					if(selectTextFormatInfo.label == txtId.text)
+					{
+						selectTextFormatInfo.textFormat.font = txtFont.text;
+						selectTextFormatInfo.textFormat.size = numSize.value;;
+						selectTextFormatInfo.textFormat.color = colorPicker.selectedColor;
+						selectTextFormatInfo.textFormat.bold = checkBold.selected;
+						selectTextFormatInfo.textFormat.italic = checkItalic.selected;
+						if(rLeft.selected)
+						{
+							selectTextFormatInfo.textFormat.align = TextAlign.LEFT;
+						}
+						else if(rCenter.selected)
+						{
+							selectTextFormatInfo.textFormat.align = TextAlign.CENTER;
+						}
+						else if(rRight.selected)
+						{
+							selectTextFormatInfo.textFormat.align = TextAlign.RIGHT;
+						}
+						optionManager.saveTextFormat();
+						
+						Alert.show("修改完成");
+					}
+					else
+					{
+						Alert.show("不可以修改Id");
+					}
+				}
+				else
+				{
+					Alert.show("先选择要修改的字体");
+				}
+			}
+			
+			protected function button3_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				PopUpManager.removePopUp(this);
+				Manager.textInPutEnable = true;
+			}
+			
+			protected function button4_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				if(callbackFunction == null)
+				{
+					PopUpManager.removePopUp(this);
+					Manager.textInPutEnable = true;
+				}
+				else if(list.selectedIndex >= 0)
+				{
+					callbackFunction(list.selectedItem as TextFormatInfo);
+					
+					PopUpManager.removePopUp(this);
+					Manager.textInPutEnable = true;
+				}
+				else
+				{
+					Alert.show("先选中字体");
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<s:Panel left="0" right="0" top="0" bottom="0">
+		<s:Label x="251" y="10" width="43" text="预览"/>
+		<mx:TextInput id="txtLabel" x="323" y="120" change="txtLabel_changeHandler(event)"
+					 text="Label"/>
+		<s:Label x="252" y="126" width="86" text="测试文字："/>
+		<s:List id="list" left="10" top="10" bottom="39" width="187"
+				change="list_changeHandler(event)"></s:List>
+		<s:Button bottom="10" label="确认" click="button4_clickHandler(event)" horizontalCenter="-41"/>
+		<s:Button bottom="10" label="取消" click="button3_clickHandler(event)" horizontalCenter="94"/>
+		<s:Label x="252" y="183" width="43" text="字体："/>
+		<mx:TextInput id="txtFont" x="299" y="177" width="128"/>
+		<s:Label x="252" y="212" text="字号"/>
+		<s:NumericStepper id="numSize" x="285" y="206" value="12" change="numSize_changeHandler(event)"
+						  maximum="72" minimum="8"/>
+		<s:CheckBox id="checkBold" x="359" y="210" label="加粗" change="checkBold_changeHandler(event)"/>
+		<s:CheckBox id="checkItalic" x="430" y="210" label="倾斜"
+					 change="checkItalic_changeHandler(event)"/>
+		<s:Label x="252" y="153" width="43" text="编号："/>
+		<s:TextInput id="txtId" x="299" y="147"/>
+		<s:Button x="251" y="266" label="添加" click="button1_clickHandler(event)"/>
+		<s:Button x="358" y="266" label="修改" click="button2_clickHandler(event)"/>
+		<mx:ColorPicker id="colorPicker" x="435" y="180" change="colorPicker_changeHandler(event)"/>
+		<s:RadioButton id="rLeft" x="241" y="240" width="64" label="Left" groupName="align" selected="true" click="radiobutton1_changeHandler(event)"/>
+		<s:RadioButton id="rCenter" x="322" y="240" width="70" label="center" groupName="align" click="radiobutton1_changeHandler(event)"/>
+		<s:RadioButton id="rRight" x="416" y="238" label="right" groupName="align" click="radiobutton1_changeHandler(event)"/>
+		<s:BorderContainer x="241" y="30" width="255" height="82">
+			<s:SWFLoader id="image" left="0" right="0" top="0" bottom="0" scaleContent="false"/>
+		</s:BorderContainer>
+	</s:Panel>
+</s:Group>

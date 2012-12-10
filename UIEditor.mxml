@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx" width="800" height="600" creationComplete="windowedapplication1_creationCompleteHandler(event)">
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.FlexEvent;
+			import mx.events.ListEvent;
+			import mx.events.MenuEvent;
+			import mx.managers.PopUpManager;
+			
+			import panel.ButtonSelectPanel;
+			import panel.CheckBoxSelectPanel;
+			import panel.ErrorPanel;
+			import panel.NumberEditorPanel;
+			import panel.PanelSelectPanel;
+			import panel.SettingPanel;
+			import panel.StringEditorPanel;
+			import panel.TextFormatPanel;
+			
+			import ui.ResizablePanel;
+			import ui.UISprite;
+			import ui.struct.BaseData;
+			
+			public var optionManager : OptionManager;
+			
+			private var _uiSprite : UISprite;
+			
+			protected function windowedapplication1_creationCompleteHandler(event:FlexEvent):void
+			{
+				// TODO Auto-generated method stub
+				optionManager = new OptionManager();
+				refresh();
+			}
+			
+			private function refresh():void
+			{
+				optionManager.init(refreshComplete);
+			}
+			
+			private function refreshComplete(errorList : Vector.<String>):void
+			{
+				var settingCollection : ArrayCollection = new ArrayCollection();
+				settingCollection.addItem({label : "设置", id:"setting"});
+				settingCollection.addItem({label : "刷新", id:"refresh"});
+				
+				var arrayCollection : ArrayCollection = new ArrayCollection();
+				if(errorList.length == 0)
+				{
+					var fileCollection : ArrayCollection = new ArrayCollection();
+					fileCollection.addItem({label : "打开",id:"openFile"});
+					fileCollection.addItem({label : "保存",id:"saveFile"});
+					fileCollection.addItem({label : "关闭",id:"closeFile"});
+					fileCollection.addItem({label : "打包资源",id:"packageFile"});
+					fileCollection.addItem({label : "打包界面",id:"packageUI"});
+					arrayCollection.addItem({label: "文件", children:fileCollection});
+					settingCollection.addItem({label : "刷新列表", id:"refreshTree"});
+					settingCollection.addItem({label : "编辑字体", id:"textFormat"});
+					initList();
+				}
+				else
+				{
+					var errorPanel : ErrorPanel = new ErrorPanel();
+					errorPanel.errorList = errorList;
+					PopUpManager.addPopUp(errorPanel,this, true);
+					PopUpManager.centerPopUp(errorPanel);
+				}
+				arrayCollection.addItem({label:"设置", children:settingCollection});
+				
+				menuBar.dataProvider = arrayCollection;
+				
+				var sprite : Sprite = new Sprite();
+				_uiSprite = new UISprite();
+				_uiSprite.dataGrid = dataGrid;
+				_uiSprite.tree = tree;
+				_uiSprite.optionManager = optionManager;
+				
+				sprite.addChild(_uiSprite);
+				var resizablePanel : ResizablePanel = new ResizablePanel();
+				sprite.addChild(resizablePanel);
+				_uiSprite.resizablePanel = resizablePanel; 
+				image.source = sprite;
+				
+				tree.dataProvider = _uiSprite.componentTree;
+			}
+			
+			protected function menuBar_itemClickHandler(event:MenuEvent):void
+			{
+				// TODO Auto-generated method stub
+				switch(event.item["id"])
+				{
+					case "setting":
+						var settingPanel : SettingPanel = new SettingPanel();
+						settingPanel.callbackFunction = refresh;
+						settingPanel.optionManager = optionManager;
+						PopUpManager.addPopUp(settingPanel,this,true);
+						PopUpManager.centerPopUp(settingPanel);
+						break;
+					case "refresh":
+						refresh();
+						break;
+					case "closeFile":
+						_uiSprite.clear();
+						tree.invalidateList();
+						break;
+					case "refreshTree":
+						tree.invalidateList();
+						break;
+					case "textFormat":
+						var textFormatPnel : TextFormatPanel = new TextFormatPanel();
+						textFormatPnel.optionManager = optionManager;
+						PopUpManager.addPopUp(textFormatPnel,this,true);
+						PopUpManager.centerPopUp(textFormatPnel);
+						break;
+					case "saveFile":
+						_uiSprite.saveFiles();
+						break;
+					case "openFile":
+						var file : File = new File(optionManager.uiDictionary);
+						file.browseForOpen("打开界面");
+						file.addEventListener(Event.SELECT, onSelectOpenFile);
+						file.addEventListener(Event.CANCEL, onCancelOpenFile);
+						break;
+					case "packageFile":
+						if(optionManager.resPackagePath != null && optionManager.resPackagePath.length > 0)
+						{
+							optionManager.outputRes();
+						}
+						else
+						{
+							Alert.show("先设置打包路径");
+						}
+						break;
+					case "packageUI":
+						if(optionManager.uiPackagePath != null && optionManager.uiPackagePath.length > 0)
+						{
+							optionManager.outputUI();
+						}
+						else
+						{
+							Alert.show("先设置打包路径");
+						}
+						break;
+				}
+			}
+			
+			private function onSelectOpenFile(event : Event):void
+			{
+				var file : File = event.currentTarget as File;
+				file.removeEventListener(Event.SELECT, onSelectOpenFile);
+				file.removeEventListener(Event.CANCEL, onCancelOpenFile);
+				
+				var fileStream : FileStream = new FileStream();
+				fileStream.open(file, FileMode.READ);
+				var xml : XML = XML(fileStream.readUTFBytes(fileStream.bytesAvailable));
+				fileStream.close();
+				var baseData : BaseData = BaseData.openFile(xml, optionManager);
+				if(baseData != null)
+				{
+					_uiSprite.setSelectedData(null);
+					_uiSprite.addComponent(baseData);
+				}
+			}
+			
+			private function onCancelOpenFile(event : Event):void
+			{
+				var file : File = event.currentTarget as File;
+				file.removeEventListener(Event.SELECT, onSelectOpenFile);
+				file.removeEventListener(Event.CANCEL, onCancelOpenFile);
+				
+			}
+			
+			private function initList():void
+			{
+				var arrayCollection : ArrayCollection = new ArrayCollection();
+				arrayCollection.addItem("Button");
+				arrayCollection.addItem("UIPanel");
+				arrayCollection.addItem("CheckBox");
+				arrayCollection.addItem("Label");
+				listComponent.dataProvider = arrayCollection;
+			}
+			
+			protected function listComponent_itemClickHandler(event:ListEvent):void
+			{
+				// TODO Auto-generated method stub
+				var selectedString : String = listComponent.selectedItem as String;
+				if(selectedString != null)
+				{
+					switch(selectedString)
+					{
+						case "Button":
+							var buttonSelectPanel : ButtonSelectPanel = new ButtonSelectPanel();
+							buttonSelectPanel.optionManager = optionManager;
+							buttonSelectPanel.callbackFunction = _uiSprite.addComponent;
+							PopUpManager.addPopUp(buttonSelectPanel,this, true);
+							PopUpManager.centerPopUp(buttonSelectPanel);
+							break;
+						case "UIPanel":
+							var panelSelectPanel : PanelSelectPanel = new PanelSelectPanel();
+							panelSelectPanel.optionManager = optionManager;
+							panelSelectPanel.callbackFunction = _uiSprite.addComponent;
+							PopUpManager.addPopUp(panelSelectPanel,this, true);
+							PopUpManager.centerPopUp(panelSelectPanel);
+							break;
+						case "CheckBox":
+							var checkBoxSelectPanel : CheckBoxSelectPanel = new CheckBoxSelectPanel();
+							checkBoxSelectPanel.optionManager = optionManager;
+							checkBoxSelectPanel.callbackFunction = _uiSprite.addComponent;
+							PopUpManager.addPopUp(checkBoxSelectPanel,this, true);
+							PopUpManager.centerPopUp(checkBoxSelectPanel);
+							break;
+						case "Label":
+							var stringEditorPanel : StringEditorPanel = new StringEditorPanel();
+							stringEditorPanel.type = 1;
+							stringEditorPanel.callbackFunction = _uiSprite.addComponent;
+							PopUpManager.addPopUp(stringEditorPanel,this, true);
+							PopUpManager.centerPopUp(stringEditorPanel);
+							break;
+					}
+				}
+			}
+			
+			protected function tree_changeHandler(event:ListEvent):void
+			{
+				// TODO Auto-generated method stub
+				var selectedItem : BaseData = tree.selectedItem as BaseData;
+				if(selectedItem != null)
+				{
+					_uiSprite.setSelectedData(selectedItem);
+				}
+			}
+			
+			protected function dataGrid_itemClickHandler(event:ListEvent):void
+			{
+				// TODO Auto-generated method stub
+				if(event.columnIndex == 1 && event.itemRenderer.data != null)
+				{
+					var obj : Object = event.itemRenderer.data;
+					var offsetX : int = this.width - 10;
+					var offsetY : int = this.height - dataGrid.height + event.itemRenderer.y
+						+ event.itemRenderer.height - 20;
+					var type : String = obj["type"];
+					if(type != null && type.length > 0)
+					{
+						switch(type)
+						{
+							case "String":
+								var stringEditorPanel : StringEditorPanel = new StringEditorPanel();
+								stringEditorPanel.str = obj["Value"];
+								stringEditorPanel.callbackFunction = obj["callback"];
+								stringEditorPanel.x = offsetX - stringEditorPanel.width;
+								stringEditorPanel.y = offsetY;
+								PopUpManager.addPopUp(stringEditorPanel,this,true);
+								break;
+							case "Number":
+								var numberEditorPanel : NumberEditorPanel = new NumberEditorPanel();
+								numberEditorPanel.num = obj["Value"];
+								numberEditorPanel.callbackFunction = obj["callback"];
+								numberEditorPanel.x = offsetX - numberEditorPanel.width;
+								numberEditorPanel.y = offsetY;
+								if(obj["Editable"] != null)
+								{
+									numberEditorPanel.editorable = obj["Editable"];
+								}
+								else
+								{
+									numberEditorPanel.editorable = true;
+								}
+								PopUpManager.addPopUp(numberEditorPanel,this,true);
+								break;
+							case "Skin":
+								obj["changeSkin"](this, optionManager);
+								break;
+							case "TextFormat":
+								var textFormatPnel : TextFormatPanel = new TextFormatPanel();
+								textFormatPnel.optionManager = optionManager;
+								textFormatPnel.textFormatLabel = obj["Value"];
+								textFormatPnel.callbackFunction = obj["callback"];
+								PopUpManager.addPopUp(textFormatPnel,this,true);
+								PopUpManager.centerPopUp(textFormatPnel);
+								break;
+						}
+					}
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<mx:HDividedBox width="100%" top="20" bottom="0">
+		<s:Panel width="200" height="100%" title="元素">
+			
+			<mx:VDividedBox left="0" right="0" top="0" bottom="0">
+				<mx:List id="listComponent" width="100%" height="300" iconField="icon" itemClick="listComponent_itemClickHandler(event)"></mx:List>
+				<mx:Tree id="tree" width="100%" height="100%" itemClick="tree_changeHandler(event)"></mx:Tree>
+			</mx:VDividedBox>
+		</s:Panel>
+		<s:Panel width="100%" height="100%" title="编辑区">
+			<s:Scroller left="0" right="0" top="0" bottom="0">
+				<s:Group left="0" right="0" top="0" bottom="0">
+					<s:SWFLoader id="image" width="2800" height="2800" scaleContent="false">
+						
+					</s:SWFLoader>
+				</s:Group>
+			</s:Scroller>
+		</s:Panel>
+		<s:Panel width="200" height="100%" title="数据">
+			<mx:DataGrid id="dataGrid" left="0" right="0" top="0" bottom="0" editable="false" doubleClickEnabled="false" selectable="false"
+						  itemClick="dataGrid_itemClickHandler(event)">
+				<mx:columns>
+					<mx:DataGridColumn dataField="Name" headerText="属性名" editable="false" sortable="false"></mx:DataGridColumn>
+					<mx:DataGridColumn dataField="Value" headerText="属性值" editable="false" sortable="false"></mx:DataGridColumn>
+				</mx:columns>
+			</mx:DataGrid>
+		</s:Panel>
+	</mx:HDividedBox>
+	<mx:MenuBar left="0" right="0" top="0" height="20" id="menuBar" itemClick="menuBar_itemClickHandler(event)">
+	</mx:MenuBar>
+</s:WindowedApplication>

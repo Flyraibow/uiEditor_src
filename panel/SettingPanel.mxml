@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="540" height="458" creationComplete="group1_creationCompleteHandler(event)">
+	
+	<fx:Script>
+		<![CDATA[
+			
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			
+			public var optionManager : OptionManager;
+			public var callbackFunction : Function;
+			
+			protected function button1_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				var file : File = new File();
+				file.browseForOpen("选择swf", [new FileFilter("*.swf","*.swf")]);
+				file.addEventListener(Event.SELECT, onSelectSwfFile);
+				file.addEventListener(Event.CANCEL, onCancelSwfFile);
+			}
+			
+			private function onSelectSwfFile(event : Event):void
+			{
+				var file : File = event.currentTarget as File;
+				file.removeEventListener(Event.SELECT, onSelectSwfFile);
+				file.removeEventListener(Event.CANCEL, onCancelSwfFile);
+				
+				txtSwfPath.text = file.nativePath;
+			}
+			
+			private function onCancelSwfFile(event : Event):void
+			{
+				var file : File = event.currentTarget as File;
+				file.removeEventListener(Event.SELECT, onSelectSwfFile);
+				file.removeEventListener(Event.CANCEL, onCancelSwfFile);
+			}
+			
+			protected function group1_creationCompleteHandler(event:FlexEvent):void
+			{
+				// TODO Auto-generated method stub
+				txtConfigPath.text = optionManager.skinCfgPath;
+				txtSwfPath.text = optionManager.skinSwfPath;
+				txtTextFormatPath.text = optionManager.textFormatPath;
+				txtUIDic.text = optionManager.uiDictionary;
+				txtResPackagePath.text = optionManager.resPackagePath;
+				txtUIPackagePath.text = optionManager.uiPackagePath;
+				txtResPackagePath1.text = optionManager.resPackagePath1;
+				txtUIPackagePath1.text = optionManager.uiPackagePath1;
+				txtSwcPath.text = optionManager.swcPath;
+				txtSwcPath1.text = optionManager.swcPath1;
+				
+				Manager.textInPutEnable = false;
+			}
+			
+			protected function button2_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				PopUpManager.removePopUp(this);
+				Manager.textInPutEnable = true;
+			}
+			
+			protected function button3_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				optionManager.skinCfgPath = txtConfigPath.text;
+				optionManager.skinSwfPath = txtSwfPath.text;
+				optionManager.textFormatPath = txtTextFormatPath.text;
+				optionManager.uiDictionary = txtUIDic.text;
+				optionManager.resPackagePath = txtResPackagePath.text;
+				optionManager.uiPackagePath = txtUIPackagePath.text;
+				optionManager.resPackagePath1 = txtResPackagePath1.text;
+				optionManager.uiPackagePath1 = txtUIPackagePath1.text;
+				optionManager.swcPath = txtSwcPath.text;
+				optionManager.swcPath1 = txtSwcPath1.text;
+				
+				optionManager.save();
+				Manager.textInPutEnable = true;
+				PopUpManager.removePopUp(this);
+				callbackFunction();
+			}
+			
+			protected function button4_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				var file : File = new File();
+				file.browseForOpen("选择配置xml", [new FileFilter("*.xml","*.xml")]);
+				file.addEventListener(Event.SELECT, onSelectConfigFile);
+				file.addEventListener(Event.CANCEL, onCancelConfigFile);
+			}
+			
+			private function onSelectConfigFile(event : Event):void
+			{
+				var file : File = event.currentTarget as File;
+				file.removeEventListener(Event.SELECT, onSelectConfigFile);
+				file.removeEventListener(Event.CANCEL, onCancelConfigFile);
+				
+				txtConfigPath.text = file.nativePath;
+			}
+			
+			private function onCancelConfigFile(event : Event):void
+			{
+				var file : File = event.currentTarget as File;
+				file.removeEventListener(Event.SELECT, onSelectConfigFile);
+				file.removeEventListener(Event.CANCEL, onCancelConfigFile);
+			}
+			
+			protected function button5_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				
+				var file : File = new File();
+				file.browseForOpen("选择字体xml", [new FileFilter("*.xml","*.xml")]);
+				file.addEventListener(Event.SELECT, onSelectFormatFile);
+				file.addEventListener(Event.CANCEL, onCancelFormatFile);
+			}
+			
+			private function onSelectFormatFile(event : Event):void
+			{
+				var file : File = event.currentTarget as File;
+				file.removeEventListener(Event.SELECT, onSelectFormatFile);
+				file.removeEventListener(Event.CANCEL, onCancelFormatFile);
+				
+				txtTextFormatPath.text = file.nativePath;
+			}
+			
+			private function onCancelFormatFile(event : Event):void
+			{
+				var file : File = event.currentTarget as File;
+				file.removeEventListener(Event.SELECT, onSelectFormatFile);
+				file.removeEventListener(Event.CANCEL, onCancelFormatFile);
+			}
+			
+			
+			protected function button6_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				var file : File = new File();
+				file.browseForDirectory("选择界面文件夹");
+				file.addEventListener(Event.SELECT, onSelectFileDic);
+				file.addEventListener(Event.CANCEL, onCancelFileDic);
+			}
+			
+			private function onSelectFileDic(event : Event):void
+			{
+				var file : File = event.currentTarget as File;
+				file.removeEventListener(Event.SELECT, onSelectFileDic);
+				file.removeEventListener(Event.CANCEL, onCancelFileDic);
+				
+				txtUIDic.text = file.nativePath;
+			}
+			
+			private function onCancelFileDic(event : Event):void
+			{
+				var file : File = event.currentTarget as File;
+				file.removeEventListener(Event.SELECT, onSelectFileDic);
+				file.removeEventListener(Event.CANCEL, onCancelFileDic);
+			}
+			
+			protected function button7_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				
+				var file : File = new File();
+				file.browseForSave("资源打包路径");
+				file.addEventListener(Event.SELECT, onSelectResPackageFile);
+				file.addEventListener(Event.CANCEL, onCancelResPackageFile);
+			}
+			
+			private function onSelectResPackageFile(event : Event):void
+			{
+				var file : File = event.currentTarget as File;
+				file.removeEventListener(Event.SELECT, onSelectResPackageFile);
+				file.removeEventListener(Event.CANCEL, onCancelResPackageFile);
+				
+				txtResPackagePath.text = file.nativePath;
+			}
+			
+			private function onCancelResPackageFile(event : Event):void
+			{
+				var file : File = event.currentTarget as File;
+				file.removeEventListener(Event.SELECT, onSelectResPackageFile);
+				file.removeEventListener(Event.CANCEL, onCancelResPackageFile);
+			}
+			
+			protected function button8_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				var file : File = new File();
+				file.browseForSave("界面打包路径");
+				file.addEventListener(Event.SELECT, onSelectUiPackageFile);
+				file.addEventListener(Event.CANCEL, onCancelUiPackageFile);
+			}
+			
+			private function onSelectUiPackageFile(event : Event):void
+			{
+				var file : File = event.currentTarget as File;
+				file.removeEventListener(Event.SELECT, onSelectUiPackageFile);
+				file.removeEventListener(Event.CANCEL, onCancelUiPackageFile);
+				
+				txtUIPackagePath.text = file.nativePath;
+			}
+			
+			private function onCancelUiPackageFile(event : Event):void
+			{
+				var file : File = event.currentTarget as File;
+				file.removeEventListener(Event.SELECT, onSelectUiPackageFile);
+				file.removeEventListener(Event.CANCEL, onCancelUiPackageFile);
+			}
+			
+			
+			protected function button9_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				
+				var file : File = new File();
+				file.browseForSave("资源打包路径");
+				file.addEventListener(Event.SELECT, onSelectResPackageFile1);
+				file.addEventListener(Event.CANCEL, onCancelResPackageFile1);
+			}
+			
+			private function onSelectResPackageFile1(event : Event):void
+			{
+				var file : File = event.currentTarget as File;
+				file.removeEventListener(Event.SELECT, onSelectResPackageFile1);
+				file.removeEventListener(Event.CANCEL, onCancelResPackageFile1);
+				
+				txtResPackagePath1.text = file.nativePath;
+			}
+			
+			private function onCancelResPackageFile1(event : Event):void
+			{
+				var file : File = event.currentTarget as File;
+				file.removeEventListener(Event.SELECT, onSelectResPackageFile1);
+				file.removeEventListener(Event.CANCEL, onCancelResPackageFile1);
+			}
+			
+			protected function button10_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				
+				var file : File = new File();
+				file.browseForSave("界面打包路径");
+				file.addEventListener(Event.SELECT, onSelectUiPackageFile1);
+				file.addEventListener(Event.CANCEL, onCancelUiPackageFile1);
+			}
+			
+			private function onSelectUiPackageFile1(event : Event):void
+			{
+				var file : File = event.currentTarget as File;
+				file.removeEventListener(Event.SELECT, onSelectUiPackageFile1);
+				file.removeEventListener(Event.CANCEL, onCancelUiPackageFile1);
+				
+				txtUIPackagePath1.text = file.nativePath;
+			}
+			
+			private function onCancelUiPackageFile1(event : Event):void
+			{
+				var file : File = event.currentTarget as File;
+				file.removeEventListener(Event.SELECT, onSelectUiPackageFile1);
+				file.removeEventListener(Event.CANCEL, onCancelUiPackageFile1);
+			}
+			
+			protected function button11_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				
+				var file : File = new File();
+				file.browseForOpen("SWC源路径");
+				file.addEventListener(Event.SELECT, onSelectSWCFile);
+				file.addEventListener(Event.CANCEL, onCancelSWCFile);
+			}
+			
+			private function onSelectSWCFile(event : Event):void
+			{
+				var file : File = event.currentTarget as File;
+				file.removeEventListener(Event.SELECT, onSelectSWCFile);
+				file.removeEventListener(Event.CANCEL, onCancelSWCFile);
+				
+				txtSwcPath.text = file.nativePath;
+			}
+			
+			private function onCancelSWCFile(event : Event):void
+			{
+				var file : File = event.currentTarget as File;
+				file.removeEventListener(Event.SELECT, onSelectSWCFile);
+				file.removeEventListener(Event.CANCEL, onCancelSWCFile);
+			}
+			
+			protected function button12_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				
+				var file : File = new File();
+				file.browseForSave("swc打包路径");
+				file.addEventListener(Event.SELECT, onSelectSWCFile1);
+				file.addEventListener(Event.CANCEL, onCancelSWCFile1);
+			}
+			
+			private function onSelectSWCFile1(event : Event):void
+			{
+				var file : File = event.currentTarget as File;
+				file.removeEventListener(Event.SELECT, onSelectSWCFile1);
+				file.removeEventListener(Event.CANCEL, onCancelSWCFile1);
+				
+				txtSwcPath1.text = file.nativePath;
+			}
+			
+			private function onCancelSWCFile1(event : Event):void
+			{
+				var file : File = event.currentTarget as File;
+				file.removeEventListener(Event.SELECT, onSelectSWCFile1);
+				file.removeEventListener(Event.CANCEL, onCancelSWCFile1);
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<s:Panel left="0" right="0" top="0" bottom="0">
+		<s:Label x="25" y="36" width="59" text="swf路径："/>
+		<mx:TextInput id="txtSwfPath" x="85" y="28" width="361" />
+		<s:Button x="458" y="29" label="更改" click="button1_clickHandler(event)"/>
+		<s:Label x="25" y="74" width="69" text="配置路径："/>
+		<s:Button x="458" y="69" label="更改" click="button4_clickHandler(event)"/>
+		<s:Button x="458" y="112" label="更改" click="button5_clickHandler(event)"/>
+		<s:Button x="459" y="155" label="更改" click="button6_clickHandler(event)"/>
+		<s:Button x="458" y="187" label="更改" click="button7_clickHandler(event)"/>
+		<s:Button x="458" y="221" label="更改" click="button8_clickHandler(event)"/>
+		<s:Button x="458" y="253" label="更改" click="button9_clickHandler(event)"/>
+		<s:Button x="458" y="283" label="更改" click="button10_clickHandler(event)"/>
+		<mx:TextInput id="txtResPackagePath1" x="102" y="253" width="348"/>
+		<mx:TextInput id="txtUIPackagePath1" x="102" y="285" width="348"/>
+		<s:Label x="10" y="194" width="94" text="资源打包路径："/>
+		<mx:TextInput id="txtResPackagePath" x="102" y="187" width="348"/>
+		<s:Label x="25" y="158" width="79" text="界面文件夹："/>
+		<mx:TextInput id="txtUIDic" x="101" y="154" width="348"/>
+		<mx:TextInput id="txtConfigPath" x="85" y="69" width="365"/>
+		<mx:TextInput id="txtTextFormatPath" x="84" y="112" width="365"/>
+		<s:Button x="166" y="394" label="确定" click="button3_clickHandler(event)"/>
+		<s:Button x="303" y="394" label="取消" click="button2_clickHandler(event)"/>
+		<s:Label x="25" y="119" width="59" text="字体xml："/>
+		<s:Label x="10" y="229" width="94" text="界面打包路径："/>
+		<s:Label x="9" y="296" width="94" text="界面打包:2："/>
+		<mx:TextInput id="txtUIPackagePath" x="102" y="221" width="348"/>
+		<s:Label x="10" y="264" width="74" text="打包资源2："/>
+		<s:Label x="10" y="332" width="93" text="swc路径："/>
+		<s:TextInput id="txtSwcPath" x="102" y="322" width="348"/>
+		<s:Button x="458" y="323" label="更改" click="button11_clickHandler(event)"/>
+		<s:Label x="10" y="368" width="93" text="swc路径1："/>
+		<s:TextInput id="txtSwcPath1" x="102" y="358" width="348"/>
+		<s:Button x="458" y="359" label="更改" click="button12_clickHandler(event)"/>
+	</s:Panel>
+</s:Group>
